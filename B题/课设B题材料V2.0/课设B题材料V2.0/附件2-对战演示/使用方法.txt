@@ -1,0 +1,1 @@
+将battle.rec与exe文件放在同一目录，对战记录文件名必须是battle.rec。
