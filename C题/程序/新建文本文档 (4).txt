@@ -1,0 +1,276 @@
+#include<vector>
+//注释中，一步代表落两子 
+using namespace std;
+void FindPosition(int Board[19][19],int sigh,vector<Point>&PointSet1,vector<Point>&PointSet2)
+//PointSet1代表只需下一个棋子就可胜利的情况，PointSet2代表需要连下挨着的两子才能赢的情况 
+{
+	for(int i=0;i<19;i++)//第一个循环·横 
+	{
+		int num=0;//本行拥有sigh类棋子的个数 
+		int First=19;//本行第一个sigh类棋子的位置 
+		int Last=-1;//本行最后一个sigh类棋子的位置 
+		for(int j=0;j<19;j++)//找到当前行的num、First、Last 
+		{
+			if(Board[i][j]==sigh)
+			{
+				if(j<First)
+				First=j;
+				if(j>Last)
+				Last=j;
+				num++;
+			}
+		}
+		if(num<4)//如果棋子数目小于4，那必不可能在当前步胜利 
+		continue;//跳过本行看下一行 
+		if(First-Last==4)//如果有五个棋子连在一起，看五个棋子的前一个位置是否为空 
+		{
+			if(First>=1&&Board[i][First-1]==2)
+			{
+				struct Point* a=new Point;
+				a->x=i;
+				a->y=First-1;
+				PointSet1.push_back(&a);
+			}
+			continue;
+		}
+		if(First-Last==3)//如果四子连在一起，看四个棋子的前两个位置是否为空 
+		{
+			if(First>=2&&Board[i][First-1]==2&&Board[i][First-2]==2)
+			{
+				struct Point* a=new Point;
+				struct Point* b=new Point;
+				a->x=i;
+				b->x=i;
+				a->y=First-1;
+				b->y=First-2;
+				PointSet2.push_back(&a);
+				PointSet2.push_back(&b);
+			}
+			continue; 
+		}
+		int k=0;
+		int F=19;
+		int L=-1;
+		while(k<19)
+		{
+			/*if(Board[i][k]!=sigh)
+			{
+				k++;
+				continue;
+			}*/
+			
+			if(Board[i][k]==sigh)
+			{
+				if(k<F)
+				F=k;
+				if(k>L)
+				L=k;
+				k++;
+			}
+			else if(k>=1&&Board[i][k-1]==sigh&&F+6<=19)
+			{
+				FF=F;
+				LL=L;
+				F=19;
+				L=-1;
+				if(Board[i][k]==2)
+				{
+					int kk=0;
+					for(int mm=1;mm<=6-(FF-LL+1)-1;mm++)
+					{
+						if(Board[i][k+mm]!=sigh)
+						{
+							kk=1;
+							break;
+						}
+					}
+					if(kk==0)
+					{
+						//填上就能连在一起六个 
+						struct Point* a=new Point;
+						a->x=i;
+						a->y=k;
+						PointSet1.push_back(&a);
+						k++;
+						continue;
+					}
+					else if(kk==1)
+					{
+						k++;
+						continue;
+					}
+					if(Board[i][k+1]==2)
+					{
+						int kkk=0;
+						for(int mmm=1;mmm<=6-(FF-LL+1)-2;mmm++)
+						{
+							if(Board[i][k+1+mmm]!=sigh)
+							{
+								kkk=1;
+								break;
+							}
+						}
+						if(kkk==0)
+						{
+							//填上连续的两个棋子可以连成六个 
+							struct Point* a=new Point;
+							struct Point* b=new Point;
+							a->x=i;
+							b->x=i;
+							a->y=k;
+							b->y=k+1;
+							PointSet2.push_back(&a);
+							PointSet2.push_back(&b);
+							k=k+2;
+						}
+						else if(kkk==1)
+						{
+							k=k+2;
+						}
+					}
+				}
+			}
+			else
+			{
+				F=19;
+				L=-1;
+				k++;
+			}
+		}
+	}
+	for(int i=0;i<19;i++)//第二个循环·竖 
+	{
+		int num=0;//本列拥有sigh类棋子的个数 
+		int First=19;//本列第一个sigh类棋子的位置 
+		int Last=-1;//本列最后一个sigh类棋子的位置 
+		for(int j=0;j<19;j++)//找到当前列的num、First、Last 
+		{
+			if(Board[j][i]==sigh)
+			{
+				if(j<First)
+				First=j;
+				if(j>Last)
+				Last=j;
+				num++;
+			}
+		}
+		if(num<4)//如果棋子数目小于4，那必不可能在当前步胜利 
+		continue;//跳过本列看下一行 
+		if(First-Last==4)//如果有五个棋子连在一起，看五个棋子的前一个位置是否为空 
+		{
+			if(First>=1&&Board[First-1][i]==2)
+			{
+				struct Point* a=new Point;
+				a->y=i;
+				a->x=First-1;
+				PointSet1.push_back(&a);
+			}
+			continue;
+		}
+		if(First-Last==3)//如果四子连在一起，看四个棋子的前两个位置是否为空 
+		{
+			if(First>=2&&Board[First-1][i]==2&&Board[First-2][i]==2)
+			{
+				struct Point* a=new Point;
+				struct Point* b=new Point;
+				a->y=i;
+				b->y=i;
+				a->x=First-1;
+				b->x=First-2;
+				PointSet2.push_back(&a);
+				PointSet2.push_back(&b);
+			}
+			continue; 
+		}
+		int k=0;
+		int F=19;
+		int L=-1;
+		while(k<19)
+		{
+			/*if(Board[i][k]!=sigh)
+			{
+				k++;
+				continue;
+			}*/
+			
+			if(Board[k][i]==sigh)
+			{
+				if(k<F)
+				F=k;
+				if(k>L)
+				L=k;
+				k++;
+			}
+			else if(k>=1&&Board[k-1][i]==sigh&&F+6<=19)
+			{
+				FF=F;
+				LL=L;
+				F=19;
+				L=-1;
+				if(Board[k][i]==2)
+				{
+					int kk=0;
+					for(int mm=1;mm<=6-(FF-LL+1)-1;mm++)
+					{
+						if(Board[k+mm][i]!=sigh)
+						{
+							kk=1;
+							break;
+						}
+					}
+					if(kk==0)
+					{
+						//填上就能连在一起六个 
+						struct Point* a=new Point;
+						a->y=i;
+						a->x=k;
+						PointSet1.push_back(&a);
+						k++;
+						continue;
+					}
+					else if(kk==1)
+					{
+						k++;
+						continue;
+					}
+					if(Board[k+1][i]==2)
+					{
+						int kkk=0;
+						for(int mmm=1;mmm<=6-(FF-LL+1)-2;mmm++)
+						{
+							if(Board[k+1+mmm][i]!=sigh)
+							{
+								kkk=1;
+								break;
+							}
+						}
+						if(kkk==0)
+						{
+							//填上连续的两个棋子可以连成六个 
+							struct Point* a=new Point;
+							struct Point* b=new Point;
+							a->y=i;
+							b->y=i;
+							a->x=k;
+							b->x=k+1;
+							PointSet2.push_back(&a);
+							PointSet2.push_back(&b);
+							k=k+2;
+						}
+						else if(kkk==1)
+						{
+							k=k+2;
+						}
+					}
+				}
+			}
+			else
+			{
+				F=19;
+				L=-1;
+				k++;
+			}
+		}
+	}
+	
+}

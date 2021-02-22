@@ -1,0 +1,131 @@
+#include<vector>
+using namespace std;
+struct a//结构体·用来存储还差一子就可以获胜的情况 
+{
+	int x;
+	int y;
+}; 
+struct b//结构体·用来存储连着下两子才能获胜的情况 
+{
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+};
+vector<a> PointSet1;//整个棋局中所有只下一子就可以获胜的坐标的集合 
+vector<b> PointSet2;//整个棋局中所有连下两子可以获胜的坐标的集合 
+int dv[8]={0,0,1,-1,1,-1,-1,1};
+int dw[8]={1,-1,0,0,1,-1,1,-1};//代表方向，分别为下，上，右，左，右下，左上，左下，右上 
+bool JudgeFourOrFive(int Board[19][19],int colour) 
+{
+	for(int i=0;i<19;i++)
+	{
+		for(int j=0;j<19;j++)
+		{
+			if(Board[i][j]==colour)//遍历到当前坐标上棋子的颜色为colour 
+			{
+				for(int r=0;r<8;r++)//遍历八个方向 
+				{
+					int num=1; 
+					for(int k=1;k<6;k++)//遍历当前方向下的六个棋子 
+					{
+						if((i+dv[r]*5)>=19||(i+dv[r]*5)<0||(j+dw[r]*5)>=19||(j+dw[r]*5)<0)//判断按照当前方向遍历六个棋子会不会越界 
+						break;//如果越界，跳出循环，继续遍历下一个方向的六个棋子 
+						if(Board[i+dv[r]*k][j+dw[r]*k]==colour)
+						num++;//遇到当前颜色的棋子，num加一 
+					}
+					if(num!=4||num!=5)//如果六个棋子里面颜色为colour的棋子不足4个或5个 ，那么怎么下都不会直接赢 
+					continue; //进入下一方向 
+					else if(num==5)//六个棋子里面有5个colour颜色的棋子，则余下的那个坐标只要为空，填上colour色的棋就会赢 
+					{
+						for(int k=1;k<6;k++)
+						{
+							if(Board[i+dv[r]*k][j+dw[r]*k]==2)//找到为空的坐标 
+							{
+								struct a* aa=new a;
+								aa->x=i+dv[r]*k;
+								aa->y=j+dw[r]*k;
+								PointSet1.push_back(*aa);
+							}
+						}
+					}
+					else if(num==4)//六个棋子里面有4个colour颜色的棋子，则余下的两个坐标若都为空，填上两个colour色的棋就会赢 
+					{
+						struct b* bb=new b;
+						int m=0;//判断是把坐标存在x，y还是x1，y1 
+						int counter=0; //判断那两个坐标里面有几个为空 
+						for(int k=1;k<6;k++)
+						{
+							if(Board[i+dv[r]*k][j+dw[r]*k]==2)
+							{
+								if(m==0)
+								{
+									counter++;
+									bb->x1=i+dv[r]*k;
+									bb->y1=j+dw[r]*k;
+									m=1;//填了x，y之后改变m ,下次填到x1，y1当中 
+								}
+								else if(m==1) 
+								{
+									counter++; 
+									bb->x2=i+dv[r]*k;
+									bb->y2=j+dw[r]*k;
+								}
+							}
+						}
+						if(counter==2)//如果两个坐标都为空 
+						{
+							PointSet2.push_back(*bb);
+						}
+					}
+				} 
+			}
+			else//当前坐标上颜色不为colour棋子的话进入下一循环 
+			continue;
+		}
+	}
+	if(PointSet1.size()==0&&PointSet2.size()==0)//如果PointSet1和PointSet2都为空，说明当前棋局中不存在可以直接赢的情况 
+	return false;
+	
+	vector<a>::iterator Point1,P;
+	vector<b>::iterator Point2,H; 
+	//去重1·由于遍历了八个方向，实际上，相对两个方向得到的结果有重复，比如向左向右 
+	for(Point1=PointSet1.begin();Point1!=PointSet1.end()-1;Point1++)//去重 
+	{
+		for(P=Point1+1;P!=PointSet1.end();P++)
+		{
+			if((*Point1).x==(*P).x&&(*Point1).y==(*P).y)
+			{
+				PointSet1.erase(P);
+				P--;
+			}
+		}
+	}
+	for(Point2=PointSet2.begin();Point2!=PointSet2.end()-1;Point2++)//去重 
+	{
+		for(H=Point2+1;H!=PointSet2.end();H++)
+		{
+			if((*Point2).x1==(*H).x1&&(*Point2).y1==(*H).y1&&(*Point2).x2==(*H).x2&&(*Point2).y2==(*H).y2)
+			{
+				PointSet2.erase(H);
+				H--;
+			}
+		}
+	}
+	//去重2·由于5个子的情况可能包含4个子的情况，导致有的只填一个棋就可胜利的情况，在填两个子胜利的情况里面也记录了，此时把两个子的相关记录删掉 
+	for(Point1=PointSet1.begin();Point1!=PointSet1.end();Point1++)
+	{
+		for(Point2=PointSet2.begin();Point2!=PointSet2.end();)
+		{
+			if(((*Point1).x==(*Point2).x1&&(*Point1).y==(*Point2).y1)||((*Point1).x==(*Point2).x2&&(*Point1).y==(*Point2).y2))
+			PointSet2.erase(Point2);
+			else
+			Point2++;
+		}
+	}
+	return true;
+}
+int main()
+{
+	
+ } 

@@ -1,0 +1,95 @@
+#include<vector>
+using namespace std;
+struct a
+{
+	int x;
+	int y;
+}; 
+struct b
+{
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+};
+vector<a> PointSet1;
+vector<b> PointSet2;
+int dv[4]={0,1,1,-1};
+int dw[4]={1,0,1,1};//代表方向，分别为下，右，右下，左下
+bool JudgeFourOrFive(int Board[19][19],int colour)
+{
+	for(int i=0;i<19;i++)
+	{
+		for(int j=0;j<19;j++)
+		{
+			if(Board[i][j]==colour)
+			{
+				for(int r=0;r<4;r++)
+				{
+					int num=1;
+					for(int k=1;k<6;k++)
+					{
+						if((i+dv[r]*5)>=19||(i+dv[r]*5)<0||(j+dw[r]*5)>=19||(j+dw[r]*5)<0)
+						break;
+						if(Board[i+dv[r]*k][j+dw[r]*k]==colour)
+						num++;
+					}
+					if(num!=4||num!=5)
+					continue;
+					else if(num==5)
+					{
+						for(int k=1;k<6;k++)
+						{
+							if(Board[i+dv[r]*k][j+dw[r]*k]!=colour)
+							{
+								struct a* aa=new a;
+								aa->x=i+dv[r]*k;
+								aa->y=j+dw[r]*k;
+								PointSet1.push_back(*aa);
+							}
+						}
+					}
+					else if(num==4)
+					{
+						int m=0;
+						for(int k=1;k<6;k++)
+						{
+							if(Board[i+dv[r]*k][j+dw[r]*k]!=colour)
+							{
+								struct b* bb=new b;
+								if(m==0)
+								{
+									bb->x1=i+dv[r]*k;
+									bb->y1=j+dw[r]*k;
+									m=1;
+								}
+								else
+								{
+									bb->x2=i+dv[r]*k;
+									bb->y2=j+dw[r]*k;
+								}
+							}
+						}
+					}
+				} 
+			}
+			else
+			continue;
+		}
+	}
+	if(PointSet1.size()==0&&PointSet2.size()==0)
+	return false;
+	vector<int>::iterator Point1;
+	vector<int>::iterator Point2;
+	for(Point1=PointSet1.begin();Point1!=PointSet1.end();Point1++)
+	{
+		for(Point2=PointSet2.begin();Point2!=PointSet2.end();)
+		{
+			if((*Point1).x==(*Point2).x1&&(*Point1).y==(*Point1).y1)||((*Point1).x==(*Point2).x2&&(*Point1).y==(*Point1).y2)
+			PointSet2.erase(Point2);
+			else
+			Point2++;
+		}
+	}
+	return true;
+}
